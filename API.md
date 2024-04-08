@@ -36,6 +36,10 @@
 
 * `GET /api/posts/:id` - Get the given post by ID.
 
+* `POST /api/posts/:id` - Add file to post.
+
+* `DELETE /api/posts/:id/:fileID` - Remove file from post.
+
 # Image modification
 
 * `PUT /api/posts/{id}/tags` - Assign image to new set of tags, given in attached JSON. If tags do not already exist, tags will automatically be created for each new entry. If the item already has the tag, then this operation does nothing.
