@@ -23,16 +23,17 @@ In terms of technical requirements, it will use a MongoDB database in the backen
 - AAU, I would like to mark images from other accounts as favorites.
 - AAU, I would like to delete images after uploading them.
 - AAU, I would like to modify image tags after they have been uploaded.
-- AAU, I would like to 
 
 #### Stretch Goals
 
 - AAU, I would like to personalize my profile and add a description.
+- AAU, I would like to group posts into folders in situations where tag search may be deficient or annoying (such as with comics, which may pollute the tag namespace with a lot of tags with few entries)
 - AAU, I would like to authenticate by email instead of just username and password.
 - Maybe moving everything to a S3 instance instead of using GridFS?
 
-#### Notionboard Template
+#### Kanban Board
 
+https://tree.taiga.io/project/fekinox-art-sharing-website/timeline
 
 #### Timeline
 
