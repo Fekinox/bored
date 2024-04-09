@@ -53,25 +53,49 @@ export const createPost = async (req, res) => {
 
             const savedPost = await post.save({ session: session })
             res.status(201).json(savedPost)
-            await session.endSession()
+            // await session.endSession()
         })
     } catch (error) {
         console.log(error.message)
         res.status(500).json({ message: "internal error" })
     }
+
+    await db.endSession()
 }
 
 export const deletePost = async (req, res) => {
+    let session
     try {
-        const post = await Post.findOneAndDelete({postId: req.params.id})
-        if (post) {
-            res.json({ message: "Post deleted" })
-        } else {
-            res.status(404).json({ message: `Post with id ${req.params.id} not found` })
-        }
+        session = await db.startSession()
+    } catch(e) {
+        res.status(500).json({ message: "internal error" })
+        return
+    }
+
+    try {
+        await session.withTransaction(async () => {
+            let post = await 
+                Post.findOne({postId: req.params.id})
+                    .session(session)
+                    .populate('files')
+                    .exec()
+
+            console.log(post)
+
+            await Promise.all(
+                post.files.map((file) => {
+                    return file.deleteOne()
+                })
+            )
+
+            await post.deleteOne()
+        })
+        res.status(200).json({ message: "Post deleted" })
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({ message: "internal error" })
     }
+    await session.endSession()
 }
 
 export const addFileToPost = async (req, res) => {

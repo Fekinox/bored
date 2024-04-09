@@ -45,4 +45,5 @@ const Post = new mongoose.Schema({
     }]
 })
 
+
 export default mongoose.model("Post", Post)

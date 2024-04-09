@@ -4,10 +4,23 @@ export default async (name, opts) => {
     let value
     let counter = await Counter.findOne({name: name}).session(opts.session)
     if (!counter) {
-        counter = new Counter({name: name})
+        throw new Error("undefined counter")
     }
     counter.value = counter.value + 1
     value = counter.value
     await counter.save(opts.session)
     return value
+}
+
+const counters = [
+    "post", "file",
+]
+
+// Initialize all counters
+for (let i = 0; i < counters.length; i++) {
+    const counter = await Counter.findOne({name: counters[i]})
+    if (counter) { continue }
+    console.log(`Initializing counter ${counters[i]}`)
+    let newCounter = new Counter({name: counters[i]})
+    await newCounter.save()
 }
