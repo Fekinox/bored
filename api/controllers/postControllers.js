@@ -36,14 +36,13 @@ export const createPost = async (req, res) => {
         return
     }
 
-
     try {
         await session.withTransaction(async () => {
             const newImageId = await getNextSequence("file", { session: session })
             let image = await uploadImage(req.body, req.file, newImageId)
             image.save({ session: session })
 
-            // throw new Error("oops")
+            throw new Error("oops")
 
             const newPostId = await getNextSequence("post", { session: session })
             let post = new Post({

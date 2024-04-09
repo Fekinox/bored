@@ -11,7 +11,7 @@ export default async (name, opts) => {
     counter.value = counter.value + 1
     value = counter.value
     console.log(`Saving`)
-    await counter.save()
+    await counter.save(opts.session)
     console.log(`Done`)
     return value
 }
