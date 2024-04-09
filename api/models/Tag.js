@@ -4,7 +4,9 @@ const Tag = new mongoose.Schema({
     name: {
         type: "String",
         required: true,
-        match: /[^A-Z\s]+/
+        match: /[^A-Z\s]+/,
+        index: true,
+        unique: true,
     },
     namespace: {
         type: "String",
