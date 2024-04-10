@@ -84,8 +84,9 @@ export const deletePost = async (req, res, next) => {
         next(createHttpError(500, error.message))
     }
 
+    let post
     try {
-        let post = await 
+        post = await 
             Post.findOne({postId: req.params.id})
             .session(session)
             .populate('files')
@@ -93,7 +94,7 @@ export const deletePost = async (req, res, next) => {
             .exec()
 
         if (!post) {
-            next(createHttpError(404, "Post does not exist"))
+            return next(createHttpError(404, "Post does not exist"))
         }
 
         // Check that user owns this post
@@ -101,7 +102,7 @@ export const deletePost = async (req, res, next) => {
             return t.name == req.payload.username &&
                 t.namespace == 'artist'
         })) {
-            next(createHttpError(403, "You do not own this post"))
+            return next(createHttpError(403, "You do not own this post"))
         }
     } catch (error) {
         throw createHttpError(500, error)
