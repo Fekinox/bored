@@ -29,6 +29,6 @@ app.use('/api', apiRouter)
 
 app.use(createErrorHandler())
 
-app.listen(3000, () => { console.log(`now listening on ${PORT}` )})
+app.listen(80, () => { console.log(`now listening on ${80}` )})
 
 // export default app
