@@ -8,7 +8,7 @@ import db from "../config/database.js"
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find()
+        const posts = await Post.find().populate('files')
         res.json(posts)
     } catch (error) {
         res.status(500).json({ message: "internal error" })
@@ -17,7 +17,7 @@ export const getAllPosts = async (req, res) => {
 
 export const getPostById = async (req, res) => {
     try {
-        const post = await Post.findOne({postId: req.params.id})
+        const post = await Post.findOne({postId: req.params.id}).populate('files')
         res.json(post)
     } catch (error) {
         res.status(500).json({ message: "internal error" })
@@ -60,7 +60,7 @@ export const createPost = async (req, res) => {
         res.status(500).json({ message: "internal error" })
     }
 
-    await db.endSession()
+    await session.endSession()
 }
 
 export const deletePost = async (req, res) => {

@@ -8,8 +8,8 @@ export async function uploadImage(body, file, id) {
     const form = new FormData()
     form.append('image', new Blob([file.buffer]))
     form.append('type', 'image')
-    form.append('title', `BoredApp Image`)
-    form.append('description', 'BoredApp Image')
+    form.append('title', `BoredApp Image ${id}`)
+    form.append('description', `BoredApp Image ${id}`)
 
     console.log('Uploading to imgur...')
     const resp = await axios.postForm(
@@ -30,7 +30,6 @@ export async function uploadImage(body, file, id) {
         url: imageData.link,
         imageId: id,
         imgurImageId: imageData.id,
-        deleteHash: imageData.deletehash,
         format: imageData.type,
     })
 
