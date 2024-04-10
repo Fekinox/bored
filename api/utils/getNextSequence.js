@@ -17,6 +17,7 @@ const counters = [
 ]
 
 // Initialize all counters
+console.log("Initializing counters")
 for (let i = 0; i < counters.length; i++) {
     const counter = await Counter.findOne({name: counters[i]})
     if (counter) { continue }
@@ -24,3 +25,4 @@ for (let i = 0; i < counters.length; i++) {
     let newCounter = new Counter({name: counters[i]})
     await newCounter.save()
 }
+console.log("Done initializing counters")
