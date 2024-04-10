@@ -11,7 +11,7 @@ import apiRouter from './routes/api.js'
 import createErrorHandler from "error-handler-json"
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 80
 
 app.use(cors())
 
