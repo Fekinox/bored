@@ -2,6 +2,7 @@ import "dotenv/config.js"
 import express from "express"
 import './config/database.js'
 import bodyParser from "body-parser"
+import cookieParser from "cookie-parser"
 
 import logger from 'morgan'
 import cors from 'cors'
@@ -16,6 +17,7 @@ app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(cookieParser())
 
 app.use(logger("dev"))
 
