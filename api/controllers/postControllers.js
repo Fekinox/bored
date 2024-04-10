@@ -6,25 +6,27 @@ import getNextSequence from "../utils/getNextSequence.js";
 import { uploadImage } from "../utils/imgur.js";
 import db from "../config/database.js"
 
-export const getAllPosts = async (req, res) => {
+import createHttpError from "http-errors";
+
+export const getAllPosts = async (req, res, next) => {
     try {
         const posts = await Post.find().populate('files')
         res.json(posts)
     } catch (error) {
-        res.status(500).json({ message: "internal error" })
+        next(createHttpError(500, error.message))
     }
 }
 
-export const getPostById = async (req, res) => {
+export const getPostById = async (req, res, next) => {
     try {
         const post = await Post.findOne({postId: req.params.id}).populate('files')
         res.json(post)
     } catch (error) {
-        res.status(500).json({ message: "internal error" })
+        next(createHttpError(500, error.message))
     }
 }
 
-export const createPost = async (req, res) => {
+export const createPost = async (req, res, next) => {
     // Upload the given file to imgur.
     // If successful, create a new imgur file and create a corresponding
     // post that contains that imgur file.
@@ -32,8 +34,7 @@ export const createPost = async (req, res) => {
     try {
         session = await db.startSession()
     } catch(e) {
-        res.status(500).json({ message: "internal error" })
-        return
+        next(createHttpError(500, error.message))
     }
 
     try {
@@ -53,23 +54,20 @@ export const createPost = async (req, res) => {
 
             const savedPost = await post.save({ session: session })
             res.status(201).json(savedPost)
-            // await session.endSession()
         })
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({ message: "internal error" })
+        next(createHttpError(500, error.message))
     }
 
     await session.endSession()
 }
 
-export const deletePost = async (req, res) => {
+export const deletePost = async (req, res, next) => {
     let session
     try {
         session = await db.startSession()
     } catch(e) {
-        res.status(500).json({ message: "internal error" })
-        return
+        next(createHttpError(500, error.message))
     }
 
     try {
@@ -94,8 +92,7 @@ export const deletePost = async (req, res) => {
         })
         res.status(200).json({ message: "Post deleted" })
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({ message: "internal error" })
+        next(createHttpError(500, error.message))
     }
     await session.endSession()
 }
