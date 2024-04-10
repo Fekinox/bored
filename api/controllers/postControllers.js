@@ -5,6 +5,7 @@ import ImgurFile from "../models/ImgurFile.js";
 import getNextSequence from "../utils/getNextSequence.js";
 import { uploadImage } from "../utils/imgur.js";
 import db from "../config/database.js"
+import { getAllTags } from "../utils/tag.js"
 
 import createHttpError from "http-errors";
 
@@ -19,7 +20,14 @@ export const getAllPosts = async (req, res, next) => {
 
 export const getPostById = async (req, res, next) => {
     try {
-        const post = await Post.findOne({postId: req.params.id}).populate('files')
+        const post = await Post
+            .findOne({postId: req.params.id})
+            .populate('files')
+            .populate('tags')
+
+        if (!post) {
+            next(createHttpError(404, `Post ${id} not found`))
+        }
         res.json(post)
     } catch (error) {
         next(createHttpError(500, error.message))
@@ -44,12 +52,14 @@ export const createPost = async (req, res, next) => {
             await image.save({ session: session })
 
             const newPostId = await getNextSequence("post", { session: session })
+            const tags = await getAllTags(req.body.tags)
+
             let post = new Post({
                 title: req.body.title,
                 description: req.body.description,
                 postId: newPostId,
                 files: [image["_id"]],
-                tags: [],
+                tags: tags.map((t) => t._id),
             })
 
             const savedPost = await post.save({ session: session })
@@ -89,8 +99,8 @@ export const deletePost = async (req, res, next) => {
             )
 
             await post.deleteOne()
+            res.status(200).json({ message: "Post deleted" })
         })
-        res.status(200).json({ message: "Post deleted" })
     } catch (error) {
         next(createHttpError(500, error.message))
     }

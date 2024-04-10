@@ -27,22 +27,12 @@ const Post = new mongoose.Schema({
         type: mongoose.ObjectId,
         ref: 'ImgurFile',
     }],
-    tags: [{
-        tagId: {
+    tags: [
+        {
             type: mongoose.ObjectId,
             ref: 'Tag',
         },
-        name: {
-            type: "String",
-            required: true,
-            match: /[^A-Z\s]+/,
-        },
-        namespace: {
-            type: "String",
-            required: false,
-            match: /[a-z]+/
-        },
-    }]
+    ]
 })
 
 
