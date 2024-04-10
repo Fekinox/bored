@@ -21,11 +21,14 @@ app.use(cookieParser())
 
 app.use(logger("dev"))
 
+app.get('/', (req, res) => {
+    res.json({ message: "this is the index route, the server is working" })
+})
 
 app.use('/api', apiRouter)
 
 app.use(createErrorHandler())
 
-app.listen(3000, () => console.log(`now listening on ${PORT}`))
+app.listen(3000, () => { console.log(`now listening on ${PORT}` )})
 
 // export default app
