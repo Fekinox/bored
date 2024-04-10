@@ -5,7 +5,7 @@ import ImgurFile from "../models/ImgurFile.js";
 import getNextSequence from "../utils/getNextSequence.js";
 import { uploadImage } from "../utils/imgur.js";
 import db from "../config/database.js"
-import { getAllTags } from "../utils/tag.js"
+import { getTag, getAllTags } from "../utils/tag.js"
 
 import createHttpError from "http-errors";
 
@@ -54,6 +54,10 @@ export const createPost = async (req, res, next) => {
             const newPostId = await getNextSequence("post", { session: session })
             const tags = await getAllTags(req.body.tags)
 
+            // Add a tag representing the logged-in user
+            const artistTag = await getTag(`artist:${req.payload.username}`)
+            tags.push(artistTag)
+
             let post = new Post({
                 title: req.body.title,
                 description: req.body.description,
@@ -86,10 +90,19 @@ export const deletePost = async (req, res, next) => {
                 Post.findOne({postId: req.params.id})
                     .session(session)
                     .populate('files')
+                    .populate('tags')
                     .exec()
 
             if (!post) {
                 throw new Error("post does not exist")
+            }
+
+            // Check that user owns this post
+            if (!post.tags.find((t) => {
+                return t.name == req.payload.username &&
+                    t.namespace == 'artist'
+            })) {
+                throw new Error("User does not own this post")
             }
 
             await Promise.all(
