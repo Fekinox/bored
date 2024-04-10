@@ -1,13 +1,13 @@
 import "dotenv/config.js"
 import express from "express"
-import './config/database.js'
+import './api/config/database.js'
 import bodyParser from "body-parser"
 import cookieParser from "cookie-parser"
 
 import logger from 'morgan'
 import cors from 'cors'
 
-import apiRouter from './routes/api.js'
+import apiRouter from './api/routes/api.js'
 import createErrorHandler from "error-handler-json"
 
 const app = express()
