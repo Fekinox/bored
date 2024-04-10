@@ -80,7 +80,9 @@ export const deletePost = async (req, res) => {
                     .populate('files')
                     .exec()
 
-            console.log(post)
+            if (!post) {
+                throw new Error("post does not exist")
+            }
 
             await Promise.all(
                 post.files.map((file) => {
