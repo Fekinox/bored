@@ -85,25 +85,30 @@ export const deletePost = async (req, res, next) => {
     }
 
     try {
+        let post = await 
+            Post.findOne({postId: req.params.id})
+            .session(session)
+            .populate('files')
+            .populate('tags')
+            .exec()
+
+        if (!post) {
+            next(createHttpError(404, "Post does not exist"))
+        }
+
+        // Check that user owns this post
+        if (!post.tags.find((t) => {
+            return t.name == req.payload.username &&
+                t.namespace == 'artist'
+        })) {
+            next(createHttpError(403, "You do not own this post"))
+        }
+    } catch (error) {
+        throw createHttpError(500, error)
+    }
+
+    try {
         await session.withTransaction(async () => {
-            let post = await 
-                Post.findOne({postId: req.params.id})
-                    .session(session)
-                    .populate('files')
-                    .populate('tags')
-                    .exec()
-
-            if (!post) {
-                throw new Error("post does not exist")
-            }
-
-            // Check that user owns this post
-            if (!post.tags.find((t) => {
-                return t.name == req.payload.username &&
-                    t.namespace == 'artist'
-            })) {
-                throw new Error("User does not own this post")
-            }
 
             await Promise.all(
                 post.files.map((file) => {
