@@ -23,10 +23,10 @@ const Post = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    files: [{
+    file: {
         type: mongoose.ObjectId,
         ref: 'ImgurFile',
-    }],
+    },
     tags: [
         {
             type: mongoose.ObjectId,

@@ -5,13 +5,33 @@ import ImgurFile from "../models/ImgurFile.js";
 import getNextSequence from "../utils/getNextSequence.js";
 import { uploadImage } from "../utils/imgur.js";
 import db from "../config/database.js"
-import { getTag, getAllTags } from "../utils/tag.js"
+import { getTag, getAllTags, parseTagQuery } from "../utils/tag.js"
 
 import createHttpError from "http-errors";
 
-export const getAllPosts = async (req, res, next) => {
+export const getPosts = async (req, res, next) => {
     try {
-        const posts = await Post.find().populate('files')
+        if (req.query.tags) {
+            let q
+            try {
+                q = await parseTagQuery(req.query.tags)
+            } catch (error) {
+                return res.json([])
+            }
+
+            const posts = await 
+                Post.find(q)
+                    .populate('file')
+                    .populate('tags')
+            res.json(posts)
+            return
+        }
+
+        const posts = await
+            Post.find()
+                .populate('file')
+                .populate('tags')
+
         res.json(posts)
     } catch (error) {
         next(createHttpError(500, error.message))
@@ -22,7 +42,7 @@ export const getPostById = async (req, res, next) => {
     try {
         const post = await Post
             .findOne({postId: req.params.id})
-            .populate('files')
+            .populate('file')
             .populate('tags')
 
         if (!post) {
@@ -62,7 +82,7 @@ export const createPost = async (req, res, next) => {
                 title: req.body.title,
                 description: req.body.description,
                 postId: newPostId,
-                files: [image["_id"]],
+                file: image["_id"],
                 tags: tags.map((t) => t._id),
             })
 
@@ -89,7 +109,7 @@ export const deletePost = async (req, res, next) => {
         post = await 
             Post.findOne({postId: req.params.id})
             .session(session)
-            .populate('files')
+            .populate('file')
             .populate('tags')
             .exec()
 
@@ -111,13 +131,9 @@ export const deletePost = async (req, res, next) => {
     try {
         await session.withTransaction(async () => {
 
-            await Promise.all(
-                post.files.map((file) => {
-                    return file.deleteOne()
-                })
-            )
-
+            await post.file.deleteOne()
             await post.deleteOne()
+
             res.status(200).json({ message: "Post deleted" })
         })
     } catch (error) {
@@ -126,22 +142,138 @@ export const deletePost = async (req, res, next) => {
     await session.endSession()
 }
 
-export const addFileToPost = async (req, res) => {
-    res.status(200).json({ message: `Adding file to post ${req.params.id}` })
+export const addTags = async (req, res, next) => {
+    let post
+    try {
+        post = await
+            Post.findOne({postId: req.params.id})
+                .populate('file')
+                .populate('tags')
+        if (!post) {
+            return next(createHttpError(404, "Post does not exist"))
+        }
+        // Check that user owns this post
+        if (!post.tags.find((t) => {
+            return t.name == req.payload.username &&
+                t.namespace == 'artist'
+        })) {
+            return next(createHttpError(403, "You do not own this post"))
+        }
+
+        let tagsToAdd = []
+        for (const tag of req.body) {
+            try {
+                const tagItem = await getTag(tag, {
+                    notInNamespaces: [ "artist", ]
+                }) 
+                tagsToAdd.push(tagItem._id)
+            } catch (error) {
+                continue
+            }
+        }
+
+        await Post.updateOne(
+            { postId: req.params.id },
+            {
+                $addToSet: {
+                    tags: tagsToAdd,
+                },
+                lastModifiedDate: new Date()
+            }
+        )
+    } catch (error) {
+        return next(createHttpError(500, error.message))
+    }
+
+
+    res.json({ message: "Successfully added tags to post" })
 }
 
-export const addTags = async (req, res) => {
-    res.status(200).json({ message: `Assigning ${req.params.id} to tags` })
+export const removeTags = async (req, res, next) => {
+    let post
+    try {
+        post = await
+            Post.findOne({postId: req.params.id})
+                .populate('file')
+                .populate('tags')
+        if (!post) {
+            return next(createHttpError(404, "Post does not exist"))
+        }
+        // Check that user owns this post
+        if (!post.tags.find((t) => {
+            return t.name == req.payload.username &&
+                t.namespace == 'artist'
+        })) {
+            return next(createHttpError(403, "You do not own this post"))
+        }
+
+        let tagsToPull = []
+        for (const tag of req.body) {
+            try {
+                const tagItem = await getTag(tag, {
+                    mustExist: true,
+                    notInNamespaces: [ "artist" ],
+                })
+                tagsToPull.push(tagItem._id)
+            } catch (error) {
+                continue
+            }
+        }
+
+        await Post.updateOne(
+            { postId: req.params.id },
+            {
+                $pull: {
+                    tags: { $in: tagsToPull },
+                },
+                lastModifiedDate: new Date()
+            }
+        )
+
+    } catch (error) {
+        return next(createHttpError(500, error.message))
+    }
+
+    res.json({ message: "Successfully removed tags to post" })
 }
 
-export const setMetadata = async (req, res) => {
-    res.status(200).json({ message: `Updated metadata of post ${req.params.id}` })
-}
+export const setMetadata = async (req, res, next) => {
+    let post
+    try {
+        post = await
+            Post.findOne({postId: req.params.id})
+                .populate('file')
+                .populate('tags')
+        if (!post) {
+            return next(createHttpError(404, "Post does not exist"))
+        }
+        // Check that user owns this post
+        if (!post.tags.find((t) => {
+            return t.name == req.payload.username &&
+                t.namespace == 'artist'
+        })) {
+            return next(createHttpError(403, "You do not own this post"))
+        }
 
-export const removeFileFromPost = async (req, res) => {
-    res.status(200).json({ message: `Removing file ${req.params.fileId} from post ${req.params.id}` })
-}
+        let update = {
+            lastModifiedDate: new Date()
+        }
+        if (req.body.title !== undefined) {
+            update.title = req.body.title
+        }
 
-export const removeTags = async (req, res) => {
-    res.status(200).json({ message: `Removing tags from ${req.params.id}` })
+        if (req.body.description !== undefined) {
+            update.description = req.body.description
+        }
+
+        await Post.updateOne(
+            { postId: req.params.id },
+            update
+        )
+
+    } catch (error) {
+        return next(createHttpError(500, error.message))
+    }
+
+    res.json({ message: "Successfully updated metadata" })
 }
