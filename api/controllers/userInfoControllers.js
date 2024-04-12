@@ -67,7 +67,7 @@ export const getPostsByUser = async (req, res, next) => {
             pageIndex = req.query.page
         }
 
-        const posts = await Post.statics.paginate(searchQuery, pageIndex)
+        const posts = await Post.paginate(searchQuery, pageIndex)
 
         res.json(posts)
     } catch (error) {

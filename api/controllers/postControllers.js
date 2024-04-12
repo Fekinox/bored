@@ -26,7 +26,7 @@ export const getPosts = async (req, res, next) => {
             pageIndex = req.query.page
         }
 
-        const posts = await Post.statics.paginate(tagQuery, pageIndex)
+        const posts = await Post.paginate(tagQuery, pageIndex)
 
         res.json(posts)
     } catch (error) {
