@@ -47,7 +47,8 @@ export const getPostsByUser = async (req, res, next) => {
             return next(createHttpError(404, 'User has no submitted posts'))
         }
 
-        let searchQuery
+        let searchQuery = { tags: artistTag._id }
+        let pageIndex = 1
         if (req.query.tags) {
             let q
             try {
@@ -60,14 +61,13 @@ export const getPostsByUser = async (req, res, next) => {
                 { tags: artistTag._id },
                 q
             ] }
-        } else {
-            searchQuery = { tags: artistTag._id }
+        } 
+
+        if (req.query.page) {
+            pageIndex = req.query.page
         }
 
-        const posts = await
-            Post.find(searchQuery)
-                .populate('file')
-                .populate('tags')
+        const posts = await Post.statics.paginate(searchQuery, pageIndex)
 
         res.json(posts)
     } catch (error) {

@@ -11,26 +11,22 @@ import createHttpError from "http-errors";
 
 export const getPosts = async (req, res, next) => {
     try {
+        let tagQuery = {}
+        let pageIndex = 1
+
         if (req.query.tags) {
-            let q
             try {
-                q = await parseTagQuery(req.query.tags)
+                tagQuery = await parseTagQuery(req.query.tags)
             } catch (error) {
                 return res.json([])
             }
-
-            const posts = await 
-                Post.find(q)
-                    .populate('file')
-                    .populate('tags')
-            res.json(posts)
-            return
         }
 
-        const posts = await
-            Post.find()
-                .populate('file')
-                .populate('tags')
+        if (req.query.page) {
+            pageIndex = req.query.page
+        }
+
+        const posts = await Post.statics.paginate(tagQuery, pageIndex)
 
         res.json(posts)
     } catch (error) {

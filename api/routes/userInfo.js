@@ -17,7 +17,7 @@ router.get('/:username', getUserByUsername)
 router.get('/:username/posts', getPostsByUser)
 
 router.get('/:username/favorites', getUserFavorites)
-router.post('/:username/favorites/:postId', isUserLoggedIn, addPostToFavorites)
-router.delete('/:username/favorites/:postId', isUserLoggedIn, removePostFromFavorites)
+router.post('/:username/favorites/:postId(\d)', isUserLoggedIn, addPostToFavorites)
+router.delete('/:username/favorites/:postId(\d)', isUserLoggedIn, removePostFromFavorites)
 
 export default router

@@ -17,19 +17,19 @@ import isUserLoggedIn from '../utils/authentication.js'
 const router = express.Router()
 
 router.get('/', getPosts)
-router.get('/:id', getPostById)
+router.get('/:id(\d+)', getPostById)
 
 router.post('/', isUserLoggedIn, upload.single('image'), createPost)
-router.delete('/:id', isUserLoggedIn, deletePost)
+router.delete('/:id(\d+)', isUserLoggedIn, deletePost)
 
 // router.post('/:id/addFile', 
 //     isUserLoggedIn,
 //     upload.single('image'),
 //     addFileToPost)
 
-router.put('/:id/tags', isUserLoggedIn, addTags)
-router.delete('/:id/tags', isUserLoggedIn, removeTags)
-router.put('/:id/metadata', isUserLoggedIn, setMetadata)
+router.put('/:id(\d+)/tags', isUserLoggedIn, addTags)
+router.delete('/:id(\d+)/tags', isUserLoggedIn, removeTags)
+router.put('/:id(\d+)/metadata', isUserLoggedIn, setMetadata)
 // router.delete('/:id/:fileId', isUserLoggedIn, removeFileFromPost)
 
 export default router

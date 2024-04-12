@@ -1,6 +1,20 @@
 import mongoose from 'mongoose'
 
+const postsPerPage = 10
+
 const Post = new mongoose.Schema({
+    statics: {
+        paginate(tagQuery, pageIndex) {
+            return this
+                    .find(tagQuery)
+                    .sort('-uploadDate')
+                    .skip((pageIndex - 1) * postsPerPage)
+                    .limit(postsPerPage)
+                    .populate('file')
+                    .populate('tags')
+                    
+        }
+    },
     title: {
         type: String,
         required: true,
