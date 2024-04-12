@@ -13,20 +13,27 @@ import createErrorHandler from "error-handler-json"
 const app = express()
 const PORT = process.env.PORT || 80
 
+// Cross-origin request handling
 app.use(cors())
 
+// Parse the bodies of url encoded form and json requests
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+// Parse cookies
 app.use(cookieParser())
 
+// Log all requests
 app.use(logger("dev"))
 
+// Dummy index route to see if things are working
 app.get('/', (req, res) => {
     res.json({ message: "this is the index route, the server is working" })
 })
 
+// Main API endpoint- everything routes through here
 app.use('/api', apiRouter)
 
+// Error-handling middleware
 app.use(createErrorHandler())
 
 app.listen(PORT, () => { console.log(`now listening on ${PORT}` )})

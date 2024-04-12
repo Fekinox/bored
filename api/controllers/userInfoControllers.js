@@ -95,16 +95,16 @@ export const getUserFavorites = async (req, res, next) => {
 }
 
 export const addPostToFavorites  = async (req, res, next) => {
+    if (req.params.username !== req.payload.username) {
+        return next(createHttpError(403, 'You cannot modify another user\'s favorites'))
+    }
+
     try {
         const user = await
             User.findOne({ user: req.params.username })
 
         if (!user) {
             return next(createHttpError(404, 'User not found'))
-        }
-
-        if (user.user !== req.payload.username) {
-            return next(createHttpError(403, 'You cannot modify another user\'s favorites'))
         }
 
         const post = await
@@ -126,16 +126,16 @@ export const addPostToFavorites  = async (req, res, next) => {
 }
 
 export const removePostFromFavorites  = async (req, res, next) => {
+    if (req.params.username !== req.payload.username) {
+        return next(createHttpError(403, 'You cannot modify another user\'s favorites'))
+    }
+
     try {
         const user = await
             User.findOne({ user: req.params.username })
 
         if (!user) {
             return next(createHttpError(404, 'User not found'))
-        }
-
-        if (user.user !== req.payload.username) {
-            return next(createHttpError(403, 'You cannot modify another user\'s favorites'))
         }
 
         const post = await
@@ -151,6 +151,27 @@ export const removePostFromFavorites  = async (req, res, next) => {
         )
 
         res.json({ message: "Successfully removed post from favorites" })
+    } catch (error) {
+        return next(createHttpError(500, error.message))
+    }
+}
+
+export const setUserDescription = async (req, res, next) => {
+    if (req.params.username !== req.payload.username) {
+        return next(createHttpError(403, 'You cannot modify another user\'s description'))
+    }
+
+    try {
+        const user = await
+            User.findOne({ user: req.params.username })
+
+        if (!user) {
+            return next(createHttpError(404, 'User not found'))
+        }
+
+        user.description = req.body
+        await user.save()
+        res.json({ message: "Successfully updated user description" })
     } catch (error) {
         return next(createHttpError(500, error.message))
     }

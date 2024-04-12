@@ -18,6 +18,8 @@
 
 * `POST /api/login` - Log in to the server.
 
+* `POST /api/login` - Log out from the server.
+
 # Image search
 
 * `GET /api/posts` - Returns all posts in the database, sorted by upload time.
