@@ -71,12 +71,12 @@ export const getLoginStatus = async (req, res, next) => {
         if (!boredAppToken) { throw "Not Logged In" }
         const payload = await jwt.verify(boredAppToken, process.env.AUTH_SECRET)
         res.json({
-            status: "logged in",
+            loggedIn: true,
             user: payload.username,
         })
     } catch (error) {
         res.json({
-            status: "not logged in",
+            loggedIn: false,
         })
     }
 }
