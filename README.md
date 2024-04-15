@@ -1,6 +1,6 @@
 # bored - the boring art website
 
-A NodeJS-based backend for an art website powered by MongoDB.
+A NodeJS-based backend for an art website powered by MongoDB. The frontend is located at [this repository.](https://github.com/Fekinox/bored-frontend)
 
 ## Features
 
