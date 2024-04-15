@@ -13,8 +13,13 @@ import createErrorHandler from "error-handler-json"
 const app = express()
 const PORT = process.env.PORT || 80
 
+const corsSettings = {
+    credentials: true,
+    origin: 'https://bored-fekinox-frontend-36d7e5057a53.herokuapp.com',
+}
+
 // Cross-origin request handling
-app.use(cors())
+app.use(cors(corsSettings))
 
 // Parse the bodies of url encoded form and json requests
 app.use(bodyParser.urlencoded({ extended: false }))

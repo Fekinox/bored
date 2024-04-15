@@ -20,15 +20,12 @@
 
 * `POST /api/login` - Log out from the server.
 
-# Image search
+# Image search and modification
 
 * `GET /api/posts` - Returns all posts in the database, sorted by upload time.
-    * `?tags={taglist}` Return only posts that are in one of the given tag groups, separated by commas. The syntax for tag queries is as follows:
-        * Every query is a disjunction of conjunctions, with each conjunction separated by `|`.
-        * Every conjunction is a sequence of atoms separated by either `-` or `+`, with an optional leading `-` representing the first tag is negated.
-        * An atom is either a single tagname or another valid query, wrapped in parentheses.
+    * `?tags={taglist}` - Returns all images that satisfy each of the space-separated list of tags. Querying `blonde_hair+blue_eyes` will return all images with the tags `blonde_hair` and `blue_eyes`. You can negate a tag to instead get all images that do not match that tag. So querying `blonde_hair+-blue_eyes` will return all images tagged `blonde_hair` that are not tagged with `blue_eyes`.
 
-* `POST /api/posts` - Upload an image to the database.
+* `POST /api/posts` - Upload an image to the database. User must be logged in.
     * Body (formdata)
         * `image`: The raw image/video data
         * `type`: Filetype of the image
@@ -36,30 +33,30 @@
         * `description`: Additional description for the image
         * `tags`: Comma-separated list of tags to apply to the image
 
-* `GET /api/posts/:id` - Get the given post by ID.
-
-* `POST /api/posts/:id` - Add file to post.
-
-* `DELETE /api/posts/:id/:fileID` - Remove file from post.
+* `GET /api/posts/{id}` - Get the given post by ID.
 
 # Image modification
 
-* `PUT /api/posts/{id}/tags` - Assign image to new set of tags, given in attached JSON. If tags do not already exist, tags will automatically be created for each new entry. If the item already has the tag, then this operation does nothing.
+* `PUT /api/posts/{id}/tags` - Assign image to new set of tags, given in attached JSON. If tags do not already exist, tags will automatically be created for each new entry. If the item already has the tag, then this operation does nothing. User must be logged in and must own the image.
     * ```json
       {
           tags: [ "tag1", "tag2", ... ]
       }
       ```
 
-* `DELETE /api/posts/{id}/tags` - Remove tags from the given image. If the image doesn't already have the tag, then this operation will do nothing.
+* `DELETE /api/posts/{id}/tags` - Remove tags from the given image. If the image doesn't already have the tag, then this operation will do nothing. User must be logged in and must own the image.
     * ```json
       {
+          tags: [ "tag1", "tag2", ... ]
       }
       ```
 
-* `PUT /api/posts/{id}/description` - Change the post's description.
-
-* `PUT /api/posts/{id}/title` - Change the post's title.
+* `PUT /api/posts/{id}/metadata` - Change the post's metadata by providing a JSON object of the fields you'd like to modify. User must be logged in and must own the image.
+  * ```json
+    {
+        title: (optional) string
+        description: (optional) string
+    }
 
 # User information
 
@@ -72,3 +69,5 @@
 * `POST /api/users/{userID}/favorites` - Add the attached post ID to the given user's favorites.
 
 * `DELETE /api/users/{userID}/favorites/{postID}` - Remove the attached post ID from the given user's favorites.
+
+* `PUT /api/users/{userID}/description` - Update the user's description.
