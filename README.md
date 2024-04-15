@@ -10,10 +10,10 @@ A NodeJS-based backend for an art website powered by MongoDB.
 ## Getting Started
 
 * Create a `.env` file containing the following pieces of information:
-** `DATABASE_URI` - A `mongodb://` url pointing to a MongoDB database instance you would like to use to store post informaiton.
-** `AUTH_SECRET` - Secret for use in encrypting JWT tokens to add to the client.
-** `PORT` - Port you would like to listen in on.
-** `IMGUR_CLIENT_ID`, `IMGUR_CLIENT_SECRET`, `IMGUR_ACCOUNT_TOKEN`, `IMGUR_REFRESH_TOKEN` - Obtained by registering an Imgur client ID and using it to authenticate an Imgur account to use for hosting the images. Refer to [the Imgur API docs](https://apidocs.imgur.com/#authorization-and-oauth) for more information.
+    * `DATABASE_URI` - A `mongodb://` url pointing to a MongoDB database instance you would like to use to store post informaiton.
+    * `AUTH_SECRET` - Secret for use in encrypting JWT tokens to add to the client.
+    * `PORT` - Port you would like to listen in on.
+    * `IMGUR_CLIENT_ID`, `IMGUR_CLIENT_SECRET`, `IMGUR_ACCOUNT_TOKEN`, `IMGUR_REFRESH_TOKEN` - Obtained by registering an Imgur client ID and using it to authenticate an Imgur account to use for hosting the images. Refer to [the Imgur API docs](https://apidocs.imgur.com/#authorization-and-oauth) for more information.
 * Start the server with `npm start`.
 
 ## Attributions and Technologies Used
