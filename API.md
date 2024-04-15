@@ -7,7 +7,7 @@
 
 # User authentication
 
-* `POST /api/signup` - Creates a new account.
+* `POST /api/auth/signup` - Creates a new account.
     * ```json
       {
           "userName": "[0-9a-z_-]"
@@ -16,9 +16,11 @@
       }
       ```
 
-* `POST /api/login` - Log in to the server.
+* `POST /api/auth/login` - Log in to the server.
 
-* `POST /api/login` - Log out from the server.
+* `POST /api/auth/logout` - Log out from the server.
+
+* `POST /api/auth/login-status` - If you are logged in, get the account you are logged in as, otherwise return "Not logged in"
 
 # Image search and modification
 
@@ -28,7 +30,6 @@
 * `POST /api/posts` - Upload an image to the database. User must be logged in.
     * Body (formdata)
         * `image`: The raw image/video data
-        * `type`: Filetype of the image
         * `title`: Title of the image
         * `description`: Additional description for the image
         * `tags`: Comma-separated list of tags to apply to the image

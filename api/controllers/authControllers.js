@@ -64,3 +64,19 @@ export const logout = async (req, res, next) => {
     res.clearCookie('boredAppToken')
         .json({ message: `Successfully logged out` })
 }
+
+export const getLoginStatus = async (req, res, next) => {
+    try {
+        const { boredAppToken = false } = req.cookies
+        if (!boredAppToken) { throw "Not Logged In" }
+        const payload = await jwt.verify(boredAppToken, process.env.AUTH_SECRET)
+        res.json({
+            status: "logged in",
+            user: payload.username,
+        })
+    } catch (error) {
+        res.json({
+            status: "not logged in",
+        })
+    }
+}
